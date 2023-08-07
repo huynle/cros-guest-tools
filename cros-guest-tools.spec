@@ -141,7 +141,7 @@ Requires: pulseaudio-utils
 BuildArch: noarch
 
 %description -n cros-pulse-config
-This package installs customized pulseaudio configurations to /etc/skel.
+This package installs customized pulseaudio configurations to /etc/cros/skel.
 "default.pa" is required as a workaround for the lack of udev in
 unprivileged containers.
 "daemon.conf" contains low latency configuration.
@@ -255,7 +255,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/gtk-3.0
 mkdir -p %{buildroot}%{_sysconfdir}/polkit-1/localauthority/50-local.d
 mkdir -p %{buildroot}%{_sysconfdir}/xdg
 mkdir -p %{buildroot}%{_sysconfdir}/profile.d
-mkdir -p %{buildroot}%{_sysconfdir}/skel/.config/pulse
+mkdir -p %{buildroot}%{_sysconfdir}/cros/skel/.config/pulse
 mkdir -p %{buildroot}%{_sysconfdir}/tmpfiles.d
 mkdir -p %{buildroot}%{_udevrulesdir}
 mkdir -p %{buildroot}%{_unitdir}
@@ -281,19 +281,18 @@ ln -sf /opt/google/cros-containers/bin/sommelier %{buildroot}%{_bindir}/sommelie
 ln -sf /opt/google/cros-containers/cros-adapta %{buildroot}%{_datarootdir}/themes/CrosAdapta
 %endif
 
-
-install -m 644 cros-host-fonts/usr-share-fonts-chromeos.mount %{buildroot}%{_unitdir}/usr-share-fonts-chromeos.mount
+install -m 644 cros-host-fonts/05-cros-fonts.conf %{buildroot}%{_sysconfdir}/fonts/conf.d/05-cros-fonts.conf
 install -m 644 cros-garcon/third_party/garcon.py %{buildroot}/usr/share/ansible/plugins/callback/garcon.py
 install -m 440 cros-sudo-config/10-cros-nopasswd %{buildroot}%{_sysconfdir}/sudoers.d/10-cros-nopasswd
 install -m 440 cros-sudo-config/10-cros-nopasswd.pkla %{buildroot}/var/lib/polkit-1/localauthority/10-vendor.d/10-cros-nopasswd.pkla
 install -m 644 cros-sommelier/sommelierrc  %{buildroot}%{_sysconfdir}/sommelierrc
 install -m 644 cros-sommelier/sommelier.sh %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
-install -m 644 cros-sommelier/skel.sommelierrc %{buildroot}%{_sysconfdir}/skel/.sommelierrc
-install -m 644 cros-garcon/skel.cros-garcon.conf %{buildroot}%{_sysconfdir}/skel/.config/cros-garcon.conf
-install -m 644 cros-wayland/skel.weston.ini %{buildroot}%{_sysconfdir}/skel/.config/weston.ini
+install -m 644 cros-sommelier/skel.sommelierrc %{buildroot}%{_sysconfdir}/cros/skel/.sommelierrc
+install -m 644 cros-garcon/skel.cros-garcon.conf %{buildroot}%{_sysconfdir}/cros/skel/.config/cros-garcon.conf
+install -m 644 cros-wayland/skel.weston.ini %{buildroot}%{_sysconfdir}/cros/skel/.config/weston.ini
 install -m 644 cros-wayland/10-cros-virtwl.rules %{buildroot}%{_udevrulesdir}/10-cros-virtwl.rules
-install -m 644 cros-pulse-config/default.pa %{buildroot}%{_sysconfdir}/skel/.config/pulse/default.pa
-install -m 644 cros-pulse-config/daemon.conf %{buildroot}%{_sysconfdir}/skel/.config/pulse/daemon.conf
+install -m 644 cros-pulse-config/default.pa %{buildroot}%{_sysconfdir}/cros/skel/.config/pulse/default.pa
+install -m 644 cros-pulse-config/daemon.conf %{buildroot}%{_sysconfdir}/cros/skel/.config/pulse/daemon.conf
 install -m 755 cros-garcon/garcon-terminal-handler %{buildroot}%{_bindir}/garcon-terminal-handler
 install -m 755 cros-garcon/garcon-url-handler %{buildroot}%{_bindir}/garcon-url-handler
 install -m 644 cros-notificationd/org.freedesktop.Notifications.service %{buildroot}%{_datarootdir}/dbus-1/services/org.freedesktop.Notifications.service
@@ -318,13 +317,13 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications cros-garcon/garc
 
 sed -i -e '13,20d' %{buildroot}%{_userunitdir}/sommelier-x@.service
 sed -i '13iEnvironment="SOMMELIER_XFONT_PATH=/usr/share/X11/fonts/misc,/usr/share/X11/fonts/cyrillic,/usr/share/X11/fonts/100dpi/:unscaled,/usr/share/X11/fonts/75dpi/:unscaled,/usr/share/X11/fonts/Type1,/usr/share/X11/fonts/100dpi,/usr/share/X11/fonts/75dpi,built-ins"\nEnvironment="LIBGL_DRIVERS_PATH=/opt/google/cros-containers/lib/"' %{buildroot}%{_userunitdir}/sommelier-x@.service
-sed -i 's/false/true/g' %{buildroot}%{_sysconfdir}/skel/.config/cros-garcon.conf
+sed -i 's/false/true/g' %{buildroot}%{_sysconfdir}/cros/skel/.config/cros-garcon.conf
 sed -i '1i if [ "$UID" -ne "0" ]; then' %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 sed -i '1i export XDG_RUNTIME_DIR=/run/user/$UID' %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 
 %files
-%dir %{_sysconfdir}/skel/.config
+%dir %{_sysconfdir}/cros/skel/.config
 %license LICENSE
 %doc README.md
 
@@ -344,7 +343,7 @@ echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 %{_bindir}/garcon-terminal-handler
 %{_bindir}/garcon-url-handler
 %{_datarootdir}/applications/garcon_host_browser.desktop
-%{_sysconfdir}/skel/.config/cros-garcon.conf
+%{_sysconfdir}/cros/skel/.config/cros-garcon.conf
 %{_userunitdir}/cros-garcon.service
 %{_userunitdir}/cros-garcon.service.d
 /usr/share/ansible/plugins/callback/garcon.py
@@ -352,7 +351,7 @@ echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 %doc README.md
 
 %files -n cros-host-fonts
-%{_unitdir}/usr-share-fonts-chromeos.mount
+%{_sysconfdir}/fonts/conf.d/05-cros-fonts.conf
 %license LICENSE
 %doc README.md
 
@@ -373,8 +372,8 @@ echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 %doc README.md
 
 %files -n cros-pulse-config
-%{_sysconfdir}/skel/.config/pulse/daemon.conf
-%{_sysconfdir}/skel/.config/pulse/default.pa
+%{_sysconfdir}/cros/skel/.config/pulse/daemon.conf
+%{_sysconfdir}/cros/skel/.config/pulse/default.pa
 %license LICENSE
 %doc README.md
 
@@ -385,7 +384,7 @@ echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 
 %files -n cros-sommelier
 %{_bindir}/sommelier
-%{_sysconfdir}/skel/.sommelierrc
+%{_sysconfdir}/cros/skel/.sommelierrc
 %config(noreplace) %{_sysconfdir}/sommelierrc
 %config(noreplace) %{_sysconfdir}/profile.d/sommelier.sh
 %{_userunitdir}/sommelier@.service
@@ -403,7 +402,6 @@ echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 
 %files -n cros-ui-config
 %config(noreplace) %{_sysconfdir}/gtk-2.0/gtkrc
-%{_sysconfdir}/gtk-3.0
 %config(noreplace) %{_sysconfdir}/gtk-3.0/settings.ini
 %config(noreplace) %{_sysconfdir}/xdg/Trolltech.conf
 %config(noreplace) %{_sysconfdir}/dconf/db/local.d/01-cros-ui
@@ -411,12 +409,15 @@ echo "fi" >> %{buildroot}%{_sysconfdir}/profile.d/sommelier.sh
 %doc README.md
 
 %files -n cros-wayland
-%config(noreplace) %{_sysconfdir}/skel/.config/weston.ini
+%config(noreplace) %{_sysconfdir}/cros/skel/.config/weston.ini
 %{_udevrulesdir}/10-cros-virtwl.rules
 %license LICENSE
 %doc README.md
 
 %changelog
+* Thu Dec 09 2021 Leo Puvilland leo@craftcat.dev - 	1.1-20210929git97e0120
+- Update for Fedora 35
+
 * Thu Aug 06 2020 Jason Montleon jmontleo@redhat.com - 1.0-0.39.20200806git19eab9e
 - Fix changelog error
 
